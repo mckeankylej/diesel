@@ -61,6 +61,21 @@ fn grouping_associations_maintains_ordering() {
     assert_eq!(expected_data, users_and_posts);
 }
 
+#[test]
+fn load_associated() {
+    let (connection, sean, tess, _) = conn_with_test_data();
+
+    let users = vec![sean.clone(), tess.clone()];
+    let posts = users.load_associated::<Post>(&connection).unwrap();
+    let users_and_posts = users.into_iter().zip(posts).collect::<Vec<_>>();
+
+    let seans_posts = Post::belonging_to(&sean).load(&connection).unwrap();
+    let tess_posts = Post::belonging_to(&tess).load(&connection).unwrap();
+    let expected_data = vec![(sean.clone(), seans_posts), (tess.clone(), tess_posts)];
+
+    assert_eq!(expected_data, users_and_posts);
+}
+
 fn conn_with_test_data() -> (TestConnection, User, User, User) {
     let connection = connection_with_sean_and_tess_in_users_table();
     insert(&NewUser::new("Jim", None)).into(users::table).execute(&connection).unwrap();

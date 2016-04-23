@@ -122,6 +122,7 @@ fn belonging_to_dsl_impl(
 ) {
     let parent_struct_name = builder.parent_struct_name();
     let child_struct_name = builder.child_struct_name();
+    let child_table_name = builder.child_table_name();
     let child_table = builder.child_table();
     let foreign_key = builder.foreign_key();
     let primary_key_type = builder.primary_key_type();
@@ -129,6 +130,7 @@ fn belonging_to_dsl_impl(
 
     let item = quote_item!(builder.cx,
         impl ::diesel::BelongingToDsl<$parent_struct_name> for $child_struct_name {
+            type SqlType = $child_table_name::SqlType;
             type Output = ::diesel::helper_types::FindBy<
                 $child_table,
                 $foreign_key,
@@ -144,6 +146,7 @@ fn belonging_to_dsl_impl(
 
     let item = quote_item!(builder.cx,
         impl ::diesel::BelongingToDsl<Vec<$parent_struct_name>> for $child_struct_name {
+            type SqlType = $child_table_name::SqlType;
             type Output = ::diesel::helper_types::Filter<
                 $child_table,
                 ::diesel::expression::helper_types::EqAny<
@@ -162,6 +165,7 @@ fn belonging_to_dsl_impl(
 
     let item = quote_item!(builder.cx,
         impl ::diesel::BelongingToDsl<[$parent_struct_name]> for $child_struct_name {
+            type SqlType = $child_table_name::SqlType;
             type Output = ::diesel::helper_types::Filter<
                 $child_table,
                 ::diesel::expression::helper_types::EqAny<

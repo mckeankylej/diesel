@@ -73,7 +73,7 @@ pub mod helper_types {
 
 pub mod prelude {
     //! Re-exports important traits and types. Meant to be glob imported when using Diesel.
-    pub use associations::GroupedBy;
+    pub use associations::{GroupedBy, LoadAssociated};
     pub use connection::Connection;
     pub use expression::{Expression, SelectableExpression, BoxableExpression};
     pub use expression::expression_methods::*;
