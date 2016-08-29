@@ -35,3 +35,24 @@ fn find_with_non_serial_pk() {
     assert_eq!(Ok(("Tess".to_string(),)), users.find("Tess".to_string()).first(&connection));
     assert_eq!(Ok(None::<(String,)>), users.find("Wibble").first(&connection).optional());
 }
+
+// FIXME: Remove the postgres constraint when we can use `insertable_into` on composite pks
+#[test]
+#[cfg(feature = "postgres")]
+fn find_with_composite_pk() {
+    use schema::followings::dsl::*;
+
+    let connection = connection();
+    connection.execute("INSERT INTO followings (user_id, post_id, email_notifications) \
+                        VALUES (1, 1, 't'), (1, 2, 'f'), (2, 1, 'f')")
+        .unwrap();
+
+    let first_following = Following { user_id: 1, post_id: 1, email_notifications: true };
+    let second_following = Following { user_id: 1, post_id: 2, email_notifications: false };
+    let third_following = Following { user_id: 2, post_id: 1, email_notifications: false };
+
+    assert_eq!(Ok(first_following), followings.find((1, 1)).first(&connection));
+    assert_eq!(Ok(second_following), followings.find((1, 2)).first(&connection));
+    assert_eq!(Ok(third_following), followings.find((2, 1)).first(&connection));
+    assert_eq!(Ok(None::<Following>), followings.find((2, 2)).first(&connection).optional());
+}

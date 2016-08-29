@@ -104,7 +104,15 @@ fn table_macro_call(
             if primary_keys.len() == 0 {
                 cx.span_err(sp,
                     &format!("Diesel only supports tables with primary keys.\
-                             table {} has no primary key", table_name));
+                              table {} has no primary key", table_name));
+                Err(DummyResult::any(sp))
+            } else if primary_keys.len() > 3 {
+                cx.span_err(sp,
+                    &format!("Diesel does not currently support tables with \
+                              primary keys consisting of more than 3 columns. \
+                              Table {} has {} columns in its primary key. \
+                              Please open an issue and we will increase the \
+                              limit.", table_name, primary_keys.len()));
                 Err(DummyResult::any(sp))
             } else {
                 let tokens = data.iter().map(|a| column_def_tokens(cx, sp, a, &connection))

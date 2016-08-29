@@ -107,6 +107,13 @@ pub struct NewComment<'a>(
     pub &'a str,
 );
 
+#[derive(Debug, PartialEq, Eq, Queryable)]
+pub struct Following {
+    pub user_id: i32,
+    pub post_id: i32,
+    pub email_notifications: bool,
+}
+
 #[cfg(feature = "postgres")]
 pub type TestConnection = ::diesel::pg::PgConnection;
 #[cfg(feature = "sqlite")]
